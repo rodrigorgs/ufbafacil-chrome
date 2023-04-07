@@ -1,13 +1,14 @@
-let ufstate = 'new';
-let processo = '';
+let nextCommand = {
+  name: 'wait',
+}
 
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
   if (changeInfo.status === 'complete') {
-    switch (ufstate) {
-      case 'home':
+    switch (nextCommand.name) {
+      case 'searchProcesso':
         await chrome.scripting.executeScript({
           target: {tabId},
-          args: [processo],
+          args: [nextCommand.numeroProcesso],
           function: async (processo) => {
             async function waitALittle(duration) {
               // return new Promise(res => setTimeout(res, duration ?? 1));
@@ -41,9 +42,9 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
             await clickSubmit();
           }
         });
-        ufstate = 'searched';
+        nextCommand = {name: 'openInMesaVirtual'};
         break;
-      case 'searched':
+      case 'openInMesaVirtual':
         await chrome.scripting.executeScript({
           target: {tabId: tabId},
           function: async () => {
@@ -51,7 +52,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
             imgVisualizar.parentElement.dispatchEvent(new MouseEvent('click', { bubbles: true }));
           }
         });
-        ufstate = 'visualizing';
+        nextCommand = {name: 'wait'};
         break;
     }
   }
@@ -70,6 +71,6 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
         location.href = 'https://sipac.ufba.br/public/jsp/portal.jsf';
       }
     });
-    ufstate = 'home';
+    nextCommand = {name: 'searchProcesso', numeroProcesso: processo};
   }
 });
