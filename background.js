@@ -4,8 +4,18 @@ let nextCommand = {
 
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
   if (changeInfo.status === 'complete') {
+    await chrome.scripting.executeScript({target: {tabId: tabId}, files: ['utils.js']});
+
     console.log('nextCommand', nextCommand);
     switch (nextCommand.name) {
+    case 'teste':
+      await chrome.scripting.executeScript({target: {tabId: tabId}, function: async () => {
+          console.log(1);
+          helloWorld();
+          console.log(2);
+        }
+      });
+      break;
     case 'searchProcesso':
       await chrome.scripting.executeScript({
         target: {tabId},
@@ -165,5 +175,8 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   } else if (request.type === 'createDocument') {
     await redirectTo(tab, 'https://sipac.ufba.br/sipac/portal_administrativo/index.jsf');
     nextCommand = {name: 'openCreateDocumentPage'};
+  } else if (request.type === 'teste') {
+    await redirectTo(tab, 'https://www.ufba.br/');
+    nextCommand = {name: 'teste'};
   }
 });

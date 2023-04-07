@@ -9,4 +9,9 @@ document.addEventListener('DOMContentLoaded', () => {
     window.close();
     chrome.runtime.sendMessage({ type: 'createDocument' });
   });
+
+  document.getElementById('teste').addEventListener('click', async () => {
+    window.close();
+    chrome.runtime.sendMessage({ type: 'teste' });
+  });
 });
