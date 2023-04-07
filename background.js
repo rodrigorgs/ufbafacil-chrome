@@ -4,6 +4,7 @@ let nextCommand = {
 
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
   if (changeInfo.status === 'complete') {
+    // inject util functions in every page
     await chrome.scripting.executeScript({target: {tabId: tabId}, files: ['utils.js']});
 
     console.log('nextCommand', nextCommand);
@@ -20,37 +21,20 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
       await chrome.scripting.executeScript({
         target: {tabId},
         args: [nextCommand.numeroProcesso],
-        function: async (processo) => {
-          async function waitALittle(duration) {
-            // return new Promise(res => setTimeout(res, duration ?? 1));
-            return new Promise(res => res());
+        function: async (numeroProcesso) => {
+          // navigateToConsultaProcessos
+          performEvent('mousedown', '#l-processos');
+          
+          // fillInProcesso
+          const parts = numeroProcesso.split(/[^\d]/);
+          const inputs = document.querySelectorAll('div.num_processo-div.campo-busca > input[type="text"]');
+          for (let i = 0; i < 4; i++) {
+            inputs[i].value = parts[i];
+            inputs[i].dispatchEvent(new Event('input'));
           }
-          async function navigateToConsultaProcessos() {
-            let menuItem = document.querySelector('#l-processos');
-            menuItem.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
-            return waitALittle();
-          }
-  
-          async function fillInProcesso(number) {
-            const parts = number.split(/[^\d]/);
-            const inputs = document.querySelectorAll('div.num_processo-div.campo-busca > input[type="text"]');
-            for (let i = 0; i < 4; i++) {
-              inputs[i].value = parts[i];
-              inputs[i].dispatchEvent(new Event('input'));
-            }
-            return waitALittle();
-          }
-  
-          async function clickSubmit() {
-            const btnSubmit = document.querySelector('input[value="Consultar Processo"]');
-            btnSubmit.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-            return waitALittle(2000);
-          }
-  
-  
-          await navigateToConsultaProcessos();
-          await fillInProcesso(processo);
-          await clickSubmit();
+
+          // clickSubmit
+          performEvent('click', 'input[value="Consultar Processo"]');
         }
       });
       nextCommand = {name: 'openInMesaVirtual'};
@@ -59,8 +43,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
       await chrome.scripting.executeScript({
         target: {tabId: tabId},
         function: async () => {
-          const imgVisualizar = document.querySelector('img[alt="Visualizar Processo na Mesa Virtual"]');
-          imgVisualizar.parentElement.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+          performEvent('click', 'img[alt="Visualizar Processo na Mesa Virtual"]')
         }
       });
       nextCommand = {name: 'wait'};
