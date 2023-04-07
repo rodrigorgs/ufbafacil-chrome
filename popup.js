@@ -4,4 +4,9 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.runtime.sendMessage({ type: 'searchProcesso', processo: userText });
     window.close();
   });
+
+  document.getElementById('upload').addEventListener('click', async () => {
+    window.close();
+    chrome.runtime.sendMessage({ type: 'createDocument' });
+  });
 });
