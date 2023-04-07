@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "UFBA Fácil",
+  "description": "Permite usar sistemas da UFBA de forma mais fácil",
+  "version": "1.0",
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "permissions": ["activeTab", "scripting"],
+  "background": {
+    "service_worker": "background.js"
+  }
+}
