@@ -13,6 +13,7 @@ function performEvent(eventName, selector, eventArgs) {
     element = document.querySelector(selector);
   }
   console.log(element);
+  // TODO: wait for the element to be present. See  solution that is not time-dependent: https://stackoverflow.com/questions/5525071/how-to-wait-until-an-element-exists
 
   if (element === null) {
     alert(`Element not found: ${selector}`);

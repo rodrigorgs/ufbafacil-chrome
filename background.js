@@ -2,6 +2,26 @@ let nextCommand = {
   name: 'wait',
 }
 
+////////////////////////
+
+async function searchProcesso(numeroProcesso) {
+  // navigateToConsultaProcessos
+  performEvent('mousedown', '#l-processos');
+  
+  // fillInProcesso
+  const parts = numeroProcesso.split(/[^\d]/);
+  const inputs = document.querySelectorAll('div.num_processo-div.campo-busca > input[type="text"]');
+  for (let i = 0; i < 4; i++) {
+    inputs[i].value = parts[i];
+    inputs[i].dispatchEvent(new Event('input'));
+  }
+
+  // clickSubmit
+  performEvent('click', 'input[value="Consultar Processo"]');
+}
+
+////////////////////////
+
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
   if (changeInfo.status === 'complete') {
     // inject util functions in every page
@@ -21,21 +41,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
       await chrome.scripting.executeScript({
         target: {tabId},
         args: [nextCommand.numeroProcesso],
-        function: async (numeroProcesso) => {
-          // navigateToConsultaProcessos
-          performEvent('mousedown', '#l-processos');
-          
-          // fillInProcesso
-          const parts = numeroProcesso.split(/[^\d]/);
-          const inputs = document.querySelectorAll('div.num_processo-div.campo-busca > input[type="text"]');
-          for (let i = 0; i < 4; i++) {
-            inputs[i].value = parts[i];
-            inputs[i].dispatchEvent(new Event('input'));
-          }
-
-          // clickSubmit
-          performEvent('click', 'input[value="Consultar Processo"]');
-        }
+        function: searchProcesso
       });
       nextCommand = {name: 'openInMesaVirtual'};
       break;
