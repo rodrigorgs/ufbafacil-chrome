@@ -25,10 +25,10 @@ const workflows = {
     initialUrl: 'https://sipac.ufba.br/sipac/portal_administrativo/index.jsf',    
     steps: [
       {command: openCreateDocumentPage},
-      {command: chooseDocumentType},
-      {command: chooseDocumentSubject},
-      {command: chooseNatureza},
-      {command: addAssinantes}
+      {command: chooseDocumentType, data: {value: 'DECLARAÇÃO'}},
+      {command: chooseDocumentSubject, data: {value: '125.322'}},
+      {command: chooseNatureza, data: {value: '1'}},
+      {command: addAssinantesAndText, data: {text: 'Testando 1, 2, 3'}}
     ]
   }
 }
@@ -43,36 +43,22 @@ async function openInMesaVirtual() {
   performEvent('click', 'img[alt="Visualizar Processo na Mesa Virtual"]')
 }
 async function openCreateDocumentPage() {
-  const menuProtocolo = getElementByXpath('//span[text()="Protocolo"]');
-  menuProtocolo.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
-  const submenuDocumentos = getElementByXpath('(//td[text()="Documentos"])[2]');
-  submenuDocumentos.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
-  const menuNovoDocumento = getElementByXpath('//td[text()="Cadastrar Documento"]');
-  menuNovoDocumento.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
+  performEvent('mouseover', '//span[text()="Protocolo"]');
+  performEvent('mouseover', '(//td[text()="Documentos"])[2]');
+  performEvent('mouseup', '//td[text()="Cadastrar Documento"]');
 }
-async function chooseDocumentType() {
-  const value = 'DECLARAÇÃO';
-  const txtTipoDocumento = document.getElementById('documentoForm:tipo');
-  txtTipoDocumento.focus();
-  txtTipoDocumento.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, char: value }));
-  txtTipoDocumento.value = value;
-  await new Promise(res => setTimeout(res, 2000)); // TODO: replace by a solution that is not time-dependent: https://stackoverflow.com/questions/5525071/how-to-wait-until-an-element-exists
-  const dropdown = document.querySelector('.rich-sb-cell-padding.richfaces_suggestionSelectValue');
-  dropdown.dispatchEvent(new MouseEvent('click', { bubbles: true }));    
+async function chooseDocumentType(data) {
+  const value = data.value || throwError('value is required');
+  await searchAndSelectFirstOptionRichFaces('#documentoForm\\:tipo', value);
 }
-async function chooseDocumentSubject() {
-  const value = '125.322'; // 125.322 - BANCAS EXAMINADORAS DE TRABALHO FINAL DE CURSO DE GRADUAÇÃO: INDICAÇÃO E ATUAÇÃO
-  const txtTipoDocumento = document.getElementById('documentoForm:classificacaoConarq');
-  txtTipoDocumento.focus();
-  txtTipoDocumento.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, char: value }));
-  txtTipoDocumento.value = value;
-  await new Promise(res => setTimeout(res, 2000)); // TODO: replace by a solution that is not time-dependent: https://stackoverflow.com/questions/5525071/how-to-wait-until-an-element-exists
-  const dropdown = document.querySelector('.rich-sb-cell-padding.richfaces_suggestionSelectValue');
-  dropdown.dispatchEvent(new MouseEvent('click', { bubbles: true }));    
+async function chooseDocumentSubject(data) {
+  const value = data.value || throwError('value is required');
+  await searchAndSelectFirstOptionRichFaces('#documentoForm\\:classificacaoConarq', value);
 }
-async function chooseNatureza() {
+async function chooseNatureza(data) {
+  const value = data.value || '1'; // OSTENSIVO
   const txtNatureza = document.getElementById('documentoForm:natureza');
-  txtNatureza.value = '1'; // OSTENSIVO 
+  txtNatureza.value = value;
   
   const txtAssunto = document.getElementById('documentoForm:c_assunto_detalhado');
   txtAssunto.value = 'teste';
@@ -82,15 +68,13 @@ async function chooseNatureza() {
   const radioEscrever = document.getElementsByName('documentoForm:formaDocumento')[0];
   radioEscrever.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 }
-async function addAssinantes() {
-  const btnAdicionarAssinante = document.getElementById('documentoForm:btnAdicionarAssinante');
-  btnAdicionarAssinante.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
-  const linkAdicionarMinhaAssinatura = document.getElementById('documentoForm:linkAdicionarMinhaAssinatura');
-  linkAdicionarMinhaAssinatura.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-  
-  await new Promise(res => setTimeout(res, 2000));
-  const editor = document.querySelectorAll('iframe')[2].contentDocument.body; // TODO [2] is too fragile
-  editor.innerText = 'Testando 1, 2, 3';
+async function addAssinantesAndText(data) {
+  const text = data.text || throwError('text is required');
+  const editor = document.querySelector('#documentoForm\\:_texto_documento_ifr').contentDocument.body;
+  editor.innerText = text;
+
+  performEvent('mouseover', '#documentoForm\\:btnAdicionarAssinante')
+  performEvent('click', '#documentoForm\\:linkAdicionarMinhaAssinatura')
 }
 
 async function teste() {
