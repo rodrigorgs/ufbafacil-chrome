@@ -62,9 +62,7 @@ async function chooseNatureza(data) {
   
   const txtAssunto = document.getElementById('documentoForm:c_assunto_detalhado');
   txtAssunto.value = 'teste';
-  await new Promise(res => setTimeout(res, 2000));
 
-  await new Promise(res => setTimeout(res, 1000));
   const radioEscrever = document.getElementsByName('documentoForm:formaDocumento')[0];
   radioEscrever.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 }
