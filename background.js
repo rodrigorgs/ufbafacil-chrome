@@ -27,7 +27,7 @@ const workflows = {
       {command: openCreateDocumentPage},
       {command: chooseDocumentType, data: {value: 'DECLARAÇÃO'}},
       {command: chooseDocumentSubject, data: {value: '125.322'}},
-      {command: chooseNatureza, data: {value: '1'}},
+      {command: chooseNaturezaAndAssunto, data: {natureza: '1', assunto: 'teste da extensão'}},
       {command: addAssinantesAndText, data: {text: 'Testando 1, 2, 3'}}
     ]
   }
@@ -55,13 +55,15 @@ async function chooseDocumentSubject(data) {
   const value = data.value || throwError('value is required');
   await searchAndSelectFirstOptionRichFaces('#documentoForm\\:classificacaoConarq', value);
 }
-async function chooseNatureza(data) {
-  const value = data.value || '1'; // OSTENSIVO
+async function chooseNaturezaAndAssunto(data) {
+  const natureza = data.natureza || '1'; // OSTENSIVO
+  const assunto = data.assunto || throwError('assunto is required');
+
   const txtNatureza = document.getElementById('documentoForm:natureza');
-  txtNatureza.value = value;
+  txtNatureza.value = natureza;
   
   const txtAssunto = document.getElementById('documentoForm:c_assunto_detalhado');
-  txtAssunto.value = 'teste';
+  txtAssunto.value = assunto;
 
   const radioEscrever = document.getElementsByName('documentoForm:formaDocumento')[0];
   radioEscrever.dispatchEvent(new MouseEvent('click', { bubbles: true }));
