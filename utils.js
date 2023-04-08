@@ -14,8 +14,9 @@ function getElementByXpath(path, doc) {
 }
 
 function throwError(message) {
-  console.error(message);
-  throw new Error(message);
+  const fullMessage = `UFBA Fácil Error: ${message}`;
+  console.error(fullMessage);
+  throw new Error(fullMessage);
 }
 
 async function searchAndSelectFirstOptionRichFaces(selector, value) {
