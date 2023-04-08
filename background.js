@@ -108,7 +108,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
     
     if (currentWorkflow && currentStep < currentWorkflow.steps.length) {
       // inject util functions in every page
-      await chrome.scripting.executeScript({target: {tabId: tabId}, files: ['utils.js']});
+      await chrome.scripting.executeScript({target: {tabId: tabId}, files: ['arrive.min.js', 'utils.js']});
 
       const step = currentWorkflow.steps[currentStep];
       const func = step['command'];

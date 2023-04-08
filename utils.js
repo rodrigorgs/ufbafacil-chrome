@@ -1,3 +1,13 @@
+// wait for an element that either does not exist or is not visible
+function waitFor(selector) {
+  return new Promise(resolve => {
+    document.arrive(
+      selector,
+      {fireOnAttributesModification: true, onceOnly: true},
+      () => { resolve(); });
+  });
+}
+
 function getElementByXpath(path, doc) {
   doc = doc || document;
   return doc.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
@@ -9,11 +19,15 @@ function throwError(message) {
 }
 
 async function searchAndSelectFirstOptionRichFaces(selector, value) {
+  const suggestionSelector = '.rich-sb-cell-padding.richfaces_suggestionSelectValue';
+  waitFor(suggestionSelector).then(() => {
+    // will be executed in the end, after the suggestion is shown
+    performEvent('click', suggestionSelector);
+  });
+
   const elem = document.querySelector(selector);
   elem.focus();
   performEvent('keydown', elem, { char: value });
-  await new Promise(res => setTimeout(res, 2000));
-  performEvent('click', '.rich-sb-cell-padding.richfaces_suggestionSelectValue');
 }
 
 
