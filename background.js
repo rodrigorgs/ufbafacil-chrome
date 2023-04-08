@@ -2,11 +2,8 @@ let nextCommand = {
   name: 'wait',
 }
 
-// all commands get an object as a parameter, in the following format:
-// {
-//   request: request object from the popup
-//   ...additional data from the workflow
-// }
+// all commands get an object as a parameter, containing the object returned
+// by getInitialData(), merged by object in the step's data property
 const workflows = {
   'teste': { // workflow
     initialUrl: 'https://www.ufba.br',
@@ -16,6 +13,7 @@ const workflows = {
   },
   'searchProcesso': {
     initialUrl: 'https://sipac.ufba.br/public/jsp/portal.jsf',
+    getInitialData: (request) => ({numeroProcesso: request.processo}),
     steps: [
       {command: searchProcesso},
       {command: openInMesaVirtual},
@@ -35,7 +33,7 @@ const workflows = {
 
 let currentWorkflow = null;
 let currentStep = 0;
-let currentRequest = {};
+let currentInitialData = {};
 
 ////////////////////////
 
@@ -79,7 +77,8 @@ async function teste() {
 }
 
 async function searchProcesso(data) {
-  const numeroProcesso = data.request.processo;
+  console.log('searchProcesso data:', data);
+  const numeroProcesso = data.numeroProcesso || throwError('numeroProcesso is required');
 
   // navigateToConsultaProcessos
   performEvent('mousedown', '#l-processos');
@@ -109,7 +108,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
       const func = step['command'];
       await chrome.scripting.executeScript({
         target: {tabId: tabId},
-        args: [{request: currentRequest, ...step.data}],
+        args: [{...currentInitialData, ...step.data}],
         function: func
       });
 
@@ -138,6 +137,9 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   if (currentWorkflow) {
     redirectTo(tab, currentWorkflow.initialUrl);
     currentStep = 0;
-    currentRequest = request;
+    currentInitialData = {};
+    if (currentWorkflow.getInitialData) {
+      currentInitialData = await currentWorkflow.getInitialData(request);
+    }
   }
 });
