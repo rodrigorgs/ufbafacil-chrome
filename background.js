@@ -59,14 +59,9 @@ async function chooseNaturezaAndAssunto(data) {
   const natureza = data.natureza || '1'; // OSTENSIVO
   const assunto = data.assunto || throwError('assunto is required');
 
-  const txtNatureza = document.getElementById('documentoForm:natureza');
-  txtNatureza.value = natureza;
-  
-  const txtAssunto = document.getElementById('documentoForm:c_assunto_detalhado');
-  txtAssunto.value = assunto;
-
-  const radioEscrever = document.getElementsByName('documentoForm:formaDocumento')[0];
-  radioEscrever.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+  document.getElementById('documentoForm:natureza').value = natureza;
+  document.getElementById('documentoForm:c_assunto_detalhado').value = assunto;
+  performEvent('click', "(//*[contains(text(), 'Escrever Documento')])[2]")
 }
 async function addAssinantesAndText(data) {
   const text = data.text || throwError('text is required');
